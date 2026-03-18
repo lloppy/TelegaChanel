@@ -5,6 +5,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed interface Screen {
     @Serializable data object Home : Screen
+    @Serializable data class SpacesList(val facetType: String) : Screen
+    @Serializable data object PhotoFolders : Screen
     @Serializable data class NotesChat(val spaceId: Long) : Screen
     @Serializable data class PhotoSpace(val spaceId: Long) : Screen
     @Serializable data object AllPhotos : Screen

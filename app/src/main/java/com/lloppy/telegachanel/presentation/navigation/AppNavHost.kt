@@ -10,7 +10,9 @@ import com.lloppy.telegachanel.presentation.notes_chat.NotesChatScreen
 import com.lloppy.telegachanel.presentation.photos.all_photos.AllPhotosScreen
 import com.lloppy.telegachanel.presentation.photos.camera.CameraScreen
 import com.lloppy.telegachanel.presentation.photos.folder_detail.FolderDetailScreen
+import com.lloppy.telegachanel.presentation.photos.photo_folders.PhotoFoldersScreen
 import com.lloppy.telegachanel.presentation.photos.preview.TelegramPreviewScreen
+import com.lloppy.telegachanel.presentation.spaces_list.SpacesListScreen
 
 @Composable
 fun AppNavHost(
@@ -24,15 +26,33 @@ fun AppNavHost(
     ) {
         composable<Screen.Home> {
             HomeScreen(
-                onNavigateToTextSpace = { spaceId ->
+                onNavigateToSpacesList = { facetType ->
+                    navController.navigate(Screen.SpacesList(facetType))
+                },
+                onNavigateToPhotoFolders = {
+                    navController.navigate(Screen.PhotoFolders)
+                }
+            )
+        }
+
+        composable<Screen.SpacesList> {
+            SpacesListScreen(
+                onNavigateToChat = { spaceId ->
                     navController.navigate(Screen.NotesChat(spaceId))
                 },
-                onNavigateToPhotoSpace = { spaceId ->
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<Screen.PhotoFolders> {
+            PhotoFoldersScreen(
+                onNavigateToFolder = { spaceId ->
                     navController.navigate(Screen.PhotoSpace(spaceId))
                 },
                 onNavigateToAllPhotos = {
                     navController.navigate(Screen.AllPhotos)
-                }
+                },
+                onNavigateBack = { navController.popBackStack() }
             )
         }
 
