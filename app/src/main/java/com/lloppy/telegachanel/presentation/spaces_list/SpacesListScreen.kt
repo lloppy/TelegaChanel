@@ -28,6 +28,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -46,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lloppy.telegachanel.domain.model.Space
 import com.lloppy.telegachanel.domain.model.SpaceType
+import com.lloppy.telegachanel.presentation.common.components.DeleteConfirmDialog
 import com.lloppy.telegachanel.presentation.common.components.EmptyStateView
 import com.lloppy.telegachanel.ui.theme.SpaceTheme
 import kotlinx.coroutines.flow.collectLatest
@@ -63,6 +67,7 @@ fun SpacesListScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val spaceColors = SpaceTheme.colors
+    var deleteSpaceId by remember { mutableStateOf<Long?>(null) }
 
     val isEvent = state.facetType == SpaceType.EVENT
     val accentColor = if (isEvent) spaceColors.dushaPrimary else spaceColors.razumPrimary
@@ -161,7 +166,7 @@ fun SpacesListScreen(
                             space = space,
                             containerColor = cardBgColor,
                             onClick = { viewModel.onEvent(SpacesListContract.Event.OnSpaceClicked(space)) },
-                            onLongClick = { viewModel.onEvent(SpacesListContract.Event.OnDeleteSpace(space.id)) }
+                            onLongClick = { deleteSpaceId = space.id }
                         )
                     }
                 }
@@ -195,6 +200,19 @@ fun SpacesListScreen(
                     Text("Отмена")
                 }
             }
+        )
+    }
+
+    deleteSpaceId?.let { id ->
+        val spaceName = state.spaces.find { it.id == id }?.name ?: ""
+        DeleteConfirmDialog(
+            title = "Удалить \u00AB$spaceName\u00BB?",
+            message = "Все заметки и прикреплённые фото в этом пространстве будут удалены безвозвратно",
+            onConfirm = {
+                viewModel.onEvent(SpacesListContract.Event.OnDeleteSpace(id))
+                deleteSpaceId = null
+            },
+            onDismiss = { deleteSpaceId = null }
         )
     }
 }

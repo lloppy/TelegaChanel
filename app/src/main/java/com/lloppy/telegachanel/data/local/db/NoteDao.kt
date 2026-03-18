@@ -21,6 +21,12 @@ interface NoteDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(note: NoteEntity)
 
+    @Query("SELECT * FROM notes WHERE id = :noteId")
+    suspend fun getById(noteId: Long): NoteEntity?
+
+    @Query("SELECT * FROM notes WHERE space_id = :spaceId")
+    suspend fun getAllBySpace(spaceId: Long): List<NoteEntity>
+
     @Query("DELETE FROM notes WHERE id = :noteId")
     suspend fun delete(noteId: Long)
 }

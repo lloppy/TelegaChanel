@@ -38,6 +38,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -53,6 +56,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.lloppy.telegachanel.domain.model.Space
+import com.lloppy.telegachanel.presentation.common.components.DeleteConfirmDialog
 import com.lloppy.telegachanel.presentation.common.components.EmptyStateView
 import com.lloppy.telegachanel.ui.theme.SpaceTheme
 import kotlinx.coroutines.flow.collectLatest
@@ -67,6 +71,7 @@ fun PhotoFoldersScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val spaceColors = SpaceTheme.colors
+    var deleteFolderId by remember { mutableStateOf<Long?>(null) }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
@@ -153,7 +158,7 @@ fun PhotoFoldersScreen(
                         FolderCard(
                             folder = folder,
                             onClick = { viewModel.onEvent(PhotoFoldersContract.Event.OnFolderClicked(folder)) },
-                            onLongClick = { viewModel.onEvent(PhotoFoldersContract.Event.OnDeleteFolder(folder.id)) }
+                            onLongClick = { deleteFolderId = folder.id }
                         )
                     }
 
@@ -197,6 +202,19 @@ fun PhotoFoldersScreen(
                     Text("Отмена")
                 }
             }
+        )
+    }
+
+    deleteFolderId?.let { id ->
+        val folderName = state.folders.find { it.id == id }?.name ?: ""
+        DeleteConfirmDialog(
+            title = "Удалить папку \u00AB$folderName\u00BB?",
+            message = "Все фотографии в этой папке будут удалены безвозвратно",
+            onConfirm = {
+                viewModel.onEvent(PhotoFoldersContract.Event.OnDeleteFolder(id))
+                deleteFolderId = null
+            },
+            onDismiss = { deleteFolderId = null }
         )
     }
 }

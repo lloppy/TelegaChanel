@@ -79,7 +79,14 @@ class SpaceRepositoryImpl @Inject constructor(
         )
 
     override suspend fun deleteSpace(spaceId: Long) {
+        // Clean up note image files for TEXT/EVENT spaces
+        val notes = noteDao.getAllBySpace(spaceId)
+        notes.forEach { note ->
+            note.imageUri?.let { photoFileStorage.deletePhoto(it) }
+        }
+        // Clean up photo folder files for PHOTO spaces
         photoFileStorage.deleteFolderPhotos(spaceId)
+        // CASCADE delete handles DB rows
         spaceDao.delete(spaceId)
     }
 }

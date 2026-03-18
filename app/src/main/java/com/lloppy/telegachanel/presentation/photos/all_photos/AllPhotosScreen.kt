@@ -46,6 +46,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,6 +58,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.lloppy.telegachanel.presentation.common.components.DateHeader
+import com.lloppy.telegachanel.presentation.common.components.DeleteConfirmDialog
 import com.lloppy.telegachanel.presentation.common.components.EmptyStateView
 import com.lloppy.telegachanel.ui.theme.SpaceTheme
 import kotlinx.coroutines.flow.collectLatest
@@ -68,6 +72,7 @@ fun AllPhotosScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val spaceColors = SpaceTheme.colors
+    var showDeleteConfirm by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
@@ -142,7 +147,7 @@ fun AllPhotosScreen(
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Button(
-                            onClick = { viewModel.onEvent(AllPhotosContract.Event.OnDeleteSelected) },
+                            onClick = { showDeleteConfirm = true },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.15f),
                                 contentColor = MaterialTheme.colorScheme.error
@@ -255,5 +260,18 @@ fun AllPhotosScreen(
                 }
             }
         }
+    }
+
+    if (showDeleteConfirm) {
+        val count = state.selectedPhotoIds.size
+        DeleteConfirmDialog(
+            title = "Удалить $count фото?",
+            message = "Выбранные фотографии будут удалены безвозвратно",
+            onConfirm = {
+                viewModel.onEvent(AllPhotosContract.Event.OnDeleteSelected)
+                showDeleteConfirm = false
+            },
+            onDismiss = { showDeleteConfirm = false }
+        )
     }
 }

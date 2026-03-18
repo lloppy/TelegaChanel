@@ -39,6 +39,8 @@ class PhotoRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deletePhotos(photoIds: List<Long>) {
+        val photos = photoDao.getByIds(photoIds)
+        photos.forEach { photoFileStorage.deletePhoto(it.uri) }
         photoDao.deleteByIds(photoIds)
     }
 }

@@ -2,6 +2,7 @@ package com.lloppy.telegachanel.presentation.notes_chat
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.lloppy.telegachanel.data.storage.PhotoFileStorage
 import com.lloppy.telegachanel.domain.model.Note
 import com.lloppy.telegachanel.domain.repository.SpaceRepository
 import com.lloppy.telegachanel.domain.usecase.note.AddNoteUseCase
@@ -9,7 +10,9 @@ import com.lloppy.telegachanel.domain.usecase.note.DeleteNoteUseCase
 import com.lloppy.telegachanel.domain.usecase.note.GetNotesBySpaceUseCase
 import com.lloppy.telegachanel.presentation.common.MviViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -21,7 +24,8 @@ class NotesChatViewModel @Inject constructor(
     private val getNotesBySpace: GetNotesBySpaceUseCase,
     private val addNote: AddNoteUseCase,
     private val deleteNote: DeleteNoteUseCase,
-    private val spaceRepository: SpaceRepository
+    private val spaceRepository: SpaceRepository,
+    private val photoFileStorage: PhotoFileStorage
 ) : MviViewModel<NotesChatContract.State, NotesChatContract.Event, NotesChatContract.Effect>(
     NotesChatContract.State(spaceId = savedStateHandle.get<Long>("spaceId") ?: 0)
 ) {
@@ -32,7 +36,12 @@ class NotesChatViewModel @Inject constructor(
         val spaceId = state.value.spaceId
         viewModelScope.launch {
             val space = spaceRepository.getSpaceById(spaceId)
-            setState { copy(spaceName = space?.name ?: "", spaceType = space?.type ?: com.lloppy.telegachanel.domain.model.SpaceType.TEXT) }
+            setState {
+                copy(
+                    spaceName = space?.name ?: "",
+                    spaceType = space?.type ?: com.lloppy.telegachanel.domain.model.SpaceType.TEXT
+                )
+            }
         }
         viewModelScope.launch {
             getNotesBySpace(spaceId).collect { notes ->
@@ -73,12 +82,23 @@ class NotesChatViewModel @Inject constructor(
         if (text.isEmpty() && imageUri == null) return
 
         viewModelScope.launch {
+            // Copy image to permanent storage if attached
+            val permanentUri = if (imageUri != null) {
+                withContext(Dispatchers.IO) {
+                    try {
+                        photoFileStorage.copyPhotoToFolder(imageUri, state.value.spaceId)
+                    } catch (_: Exception) {
+                        null
+                    }
+                }
+            } else null
+
             addNote(
                 Note(
                     text = text,
                     timestamp = System.currentTimeMillis(),
                     spaceId = state.value.spaceId,
-                    imageUri = imageUri
+                    imageUri = permanentUri
                 )
             )
             setState { copy(inputText = "", attachedImageUri = null) }

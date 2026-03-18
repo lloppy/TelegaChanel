@@ -4,6 +4,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -29,12 +30,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lloppy.telegachanel.domain.model.SpaceType
 import com.lloppy.telegachanel.presentation.common.components.ChatBubble
 import com.lloppy.telegachanel.presentation.common.components.DateHeader
+import com.lloppy.telegachanel.presentation.common.components.DeleteConfirmDialog
 import com.lloppy.telegachanel.presentation.common.components.EmptyStateView
 import com.lloppy.telegachanel.presentation.common.components.InputBar
 import com.lloppy.telegachanel.ui.theme.SpaceTheme
@@ -49,6 +54,7 @@ fun NotesChatScreen(
     val state by viewModel.state.collectAsState()
     val listState = rememberLazyListState()
     val spaceColors = SpaceTheme.colors
+    var deleteNoteId by remember { mutableStateOf<Long?>(null) }
 
     val isEvent = state.spaceType == SpaceType.EVENT
     val accentColor = if (isEvent) spaceColors.dushaPrimary else spaceColors.razumPrimary
@@ -148,9 +154,7 @@ fun NotesChatScreen(
                             timestamp = note.timestamp,
                             imageUri = note.imageUri,
                             bubbleColor = bubbleColor,
-                            onLongClick = {
-                                viewModel.onEvent(NotesChatContract.Event.OnDeleteNote(note.id))
-                            },
+                            onLongClick = { deleteNoteId = note.id },
                             modifier = Modifier.padding(vertical = 4.dp)
                         )
                     }
@@ -167,6 +171,18 @@ fun NotesChatScreen(
             attachedImageUri = state.attachedImageUri,
             onAttachImageClicked = { viewModel.onEvent(NotesChatContract.Event.OnAttachImageClicked) },
             onRemoveImage = { viewModel.onEvent(NotesChatContract.Event.OnRemoveImage) }
+        )
+    }
+
+    deleteNoteId?.let { id ->
+        DeleteConfirmDialog(
+            title = "Удалить заметку?",
+            message = "Заметка и прикреплённое фото будут удалены безвозвратно",
+            onConfirm = {
+                viewModel.onEvent(NotesChatContract.Event.OnDeleteNote(id))
+                deleteNoteId = null
+            },
+            onDismiss = { deleteNoteId = null }
         )
     }
 }

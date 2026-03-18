@@ -37,7 +37,7 @@ fun TelegramPhotoGrid(
 
 @Composable
 private fun SinglePhoto(photo: PhotoItem, modifier: Modifier = Modifier) {
-    val ratio = (photo.width.toFloat() / photo.height).coerceIn(0.5f, 1.5f)
+    val ratio = if (photo.height > 0) (photo.width.toFloat() / photo.height).coerceIn(0.5f, 1.5f) else 1f
     AsyncImage(
         model = photo.uri,
         contentDescription = null,
