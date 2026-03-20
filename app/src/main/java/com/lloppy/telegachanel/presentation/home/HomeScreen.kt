@@ -85,7 +85,7 @@ fun HomeScreen(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "РАЗУМ  \u00B7  ДУША  \u00B7  ТЕЛО",
+                        text = "ДУША  \u00B7  ОПЫТ  \u00B7  ТЕЛО",
                         style = MaterialTheme.typography.labelMedium,
                         color = spaceColors.textHint
                     )
@@ -99,12 +99,12 @@ fun HomeScreen(
                 }
             }
 
-            // Razum
+            // Dusha (inner)
             item {
                 FacetCard(
-                    emoji = "\uD83E\uDDE0",
-                    label = "РАЗУМ",
-                    title = "Философия",
+                    emoji = "\uD83D\uDC9C",
+                    label = "ДУША",
+                    title = "Убеждения",
                     spaces = textSpaces,
                     primaryColor = spaceColors.razumPrimary,
                     containerColor = spaceColors.razumContainer,
@@ -112,12 +112,12 @@ fun HomeScreen(
                 )
             }
 
-            // Dusha
+            // Opyt (external)
             item {
                 FacetCard(
-                    emoji = "\uD83D\uDC9C",
-                    label = "ДУША",
-                    title = "События жизни",
+                    emoji = "\uD83E\uDDE9",
+                    label = "ОПЫТ",
+                    title = "Рассуждения",
                     spaces = eventSpaces,
                     primaryColor = spaceColors.dushaPrimary,
                     containerColor = spaceColors.dushaContainer,

@@ -72,9 +72,9 @@ fun SpacesListScreen(
     val isEvent = state.facetType == SpaceType.EVENT
     val accentColor = if (isEvent) spaceColors.dushaPrimary else spaceColors.razumPrimary
     val cardBgColor = if (isEvent) spaceColors.dushaContainer else spaceColors.razumContainer
-    val emoji = if (isEvent) "\uD83D\uDC9C" else "\uD83E\uDDE0"
-    val label = if (isEvent) "ДУША" else "РАЗУМ"
-    val title = if (isEvent) "События жизни" else "Философия"
+    val emoji = if (isEvent) "\uD83E\uDDE9" else "\uD83D\uDC9C"
+    val label = if (isEvent) "ОПЫТ" else "ДУША"
+    val title = if (isEvent) "Рассуждения" else "Убеждения"
 
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->

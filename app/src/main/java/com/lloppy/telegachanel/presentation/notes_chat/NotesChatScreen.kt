@@ -59,8 +59,8 @@ fun NotesChatScreen(
     val isEvent = state.spaceType == SpaceType.EVENT
     val accentColor = if (isEvent) spaceColors.dushaPrimary else spaceColors.razumPrimary
     val bubbleColor = if (isEvent) spaceColors.dushaBubble else spaceColors.razumBubble
-    val facetLabel = if (isEvent) "\uD83D\uDC9C Душа \u00B7 События" else "\uD83E\uDDE0 Разум \u00B7 Философия"
-    val placeholder = if (isEvent) "Что произошло..." else "Напиши мысль..."
+    val facetLabel = if (isEvent) "\uD83E\uDDE9 Опыт \u00B7 Рассуждения" else "\uD83D\uDC9C Душа \u00B7 Убеждения"
+    val placeholder = if (isEvent) "Запиши рассуждение..." else "Запиши убеждение..."
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
@@ -135,7 +135,7 @@ fun NotesChatScreen(
             EmptyStateView(
                 icon = Icons.Default.ChatBubble,
                 title = "Пока пусто",
-                subtitle = if (isEvent) "Запишите первое событие" else "Напишите первую заметку",
+                subtitle = if (isEvent) "Запишите первое рассуждение" else "Запишите первое убеждение",
                 modifier = Modifier.weight(1f)
             )
         } else {

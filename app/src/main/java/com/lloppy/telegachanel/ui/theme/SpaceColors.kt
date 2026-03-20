@@ -6,12 +6,12 @@ import androidx.compose.ui.graphics.Color
 
 @Immutable
 data class SpaceColors(
-    // Razum / Mind
+    // Dusha / Soul (inner — beliefs)
     val razumPrimary: Color,
     val razumContainer: Color,
     val razumBubble: Color,
 
-    // Dusha / Soul
+    // Opyt / Experience (external — reflections)
     val dushaPrimary: Color,
     val dushaContainer: Color,
     val dushaBubble: Color,
